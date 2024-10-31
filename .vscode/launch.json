@@ -9,7 +9,7 @@
       "stopAtEntry": false,
       "externalConsole": true,
       "cwd": "d:/Etudes/Fac/Programmes_C/S3-S4/TP-SFSD/TP2-COOP",
-      "program": "d:/Etudes/Fac/Programmes_C/S3-S4/TP-SFSD/TP2-COOP/build/Debug/outDebug",
+      "program": "d:/Etudes/Fac/Programmes_C/S3-S4/TP-SFSD/TP2-COOP/test.exe",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [
