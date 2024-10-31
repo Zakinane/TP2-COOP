@@ -50,19 +50,13 @@ int main()
             for (int i = 1; i <= 3; i++)
             {
                 if (searchcustomer(&tof, i, &foundcustomer) == 0)
-                {
                     printcustomer(foundcustomer);
-                }
                 else if (searchcustomer(&tof, i, &foundcustomer) == -1)
-                {
                     printf("Customer with ID %d not found.\n", i);
-                }
             }
 
             if (openfile(tof.filename, 'A') == -1)
-            {
                 fprintf(stderr, "Error opening file in Append mode.\n");
-            }
 
             cust.customerID = 4;
             strcpy(cust.fname, "Customer4fname");
@@ -71,13 +65,9 @@ int main()
             insertcustomer(&tof, cust);
 
             if (searchcustomer(&tof, 4, &foundcustomer) == 0)
-            {
                 printcustomer(foundcustomer);
-            }
             else
-            {
                 printf("Customer with ID 4 not found.\n");
-            }
             break;
         case 1:
             // adding rental

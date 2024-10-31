@@ -27,72 +27,79 @@
     }
 }*/
 
-int openfile(char* path,char mode){
+int openfile(char *path, char mode)
+{
     TOF tof;
-    switch(mode){
-        case 'N':;
-            FILE* f=fopen(path,"w");
-            strcpy(tof.filename,path);
-            tof.mdata.nbrblocks=0;
-            tof.mdata.lastid=0;
-            writemetadata(tof.mdata,&tof);
-            fclose(f);
-            break;
-        case 'A':;
-            FILE* g=fopen(path,"r+b");
-            readmetadata(&tof);
-            fclose(g);
-            break;
-        default:
-            fprintf(stderr, "Invalid mode: %c\n", mode);
-            return -1;
+    switch (mode)
+    {
+    case 'N':;
+        FILE *f = fopen(path, "wb");
+        strcpy(tof.filename, path);
+        tof.mdata.nbrblocks = 0;
+        tof.mdata.lastid = 0;
+        writemetadata(tof.mdata, &tof);
+        fclose(f);
+        break;
+    case 'A':;
+        FILE *g = fopen(path, "rb+");
+        readmetadata(&tof);
+        fclose(g);
+        break;
+    default:
+        fprintf(stderr, "Invalid mode: %c\n", mode);
+        return -1;
     }
-    return -2;
+    return 0;
 }
 
-void writemetadata(mdata metadata,TOF* tof){
-    FILE *f=fopen(tof->filename,"r+");
-    fwrite(&metadata,sizeof(mdata),1,f);
+void writemetadata(mdata metadata, TOF *tof)
+{
+    FILE *f = fopen(tof->filename, "rb+");
+    fwrite(&metadata, sizeof(mdata), 1, f);
     fclose(f);
 }
 
-void readmetadata(TOF* tof){
-    FILE *f=fopen(tof->filename,"r+");
-    fread(& tof->mdata,sizeof(mdata),1,f);
+void readmetadata(TOF *tof)
+{
+    FILE *f = fopen(tof->filename, "rb+");
+    fread(&tof->mdata, sizeof(mdata), 1, f);
     fclose(f);
 }
 
-void insertcustomer(TOF* tof,customer cust){
+void insertcustomer(TOF *tof, customer cust)
+{
     block blockc;
-    int read = readblock(tof,&blockc,tof->mdata.nbrblocks);
-    if(read == -1 || blockc.numRecords == MAX_RECORDS ){  /*10 as the max number of records*/
+    int read = readblock(tof, &blockc, tof->mdata.nbrblocks - 1);
+
+    if (read == -1 || blockc.numRecords == MAX_RECORDS) // 10 as the max number of records
+    {
         block newblockc;
-        newblockc.records[0].customer= cust;
+        newblockc.records[0].customer = cust;
         newblockc.numRecords = 1;
-        writeblock(tof,tof->mdata.nbrblocks,&newblockc);
+        writeblock(tof, tof->mdata.nbrblocks, &newblockc);
         tof->mdata.nbrblocks++;
-        writemetadata(tof->mdata,tof);
-        
+        writemetadata(tof->mdata, tof);
     }
-    else{
+    else
+    {
         blockc.records[blockc.numRecords].customer = cust;
         blockc.numRecords++;
-        writeblock(tof,tof->mdata.nbrblocks-1,&blockc);
-        tof->mdata.nbrblocks++;
-        writemetadata(tof->mdata,tof);
+        writeblock(tof, tof->mdata.nbrblocks - 1, &blockc);
     }
 }
 
-int searchcustomer(TOF* tof,int customerID,customer* foundcustomer){
+int searchcustomer(TOF *tof, int customerID, customer *foundcustomer)
+{
     block blockc;
-    for (int i = 0; i < tof->mdata.nbrblocks; i++) {
-        if (readblock(tof, &blockc, i) == -1) {
+    for (int i = 0; i < tof->mdata.nbrblocks; i++)
+    {
+        if (readblock(tof, &blockc, i) == -1)
             return -1;
-        }
 
-        for (int j = 0; j < blockc.numRecords; j++) {
-            
-            if (blockc.records[j].customer.customerID == customerID) {
+        for (int j = 0; j < blockc.numRecords; j++)
+        {
+            if (blockc.records[j].customer.customerID == customerID)
+            {
                 *foundcustomer = blockc.records[j].customer;
                 return 0;
             }
@@ -101,39 +108,39 @@ int searchcustomer(TOF* tof,int customerID,customer* foundcustomer){
     return -1;
 }
 
-int writeblock(TOF* tof,int nbrblocks,block *blockc){
-    
-    FILE* f = fopen(tof->filename, "r+b");
+int writeblock(TOF *tof, int nbrblocks, block *blockc)
+{
+
+    FILE *f = fopen(tof->filename, "rb+");
 
     fseek(f, nbrblocks * sizeof(block), SEEK_SET);
     int found = fwrite(blockc, sizeof(block), 1, f);
     fclose(f);
 
-    if(found == 1){
+    if (found == 1)
         return 0;
-    }else{
+    else
         return -1;
-    }
 }
 
+int readblock(TOF *tof, block *blockc, int nbrblocks)
+{
 
-int readblock(TOF* tof,block* blockc,int nbrblocks){
+    FILE *f = fopen(tof->filename, "rb");
 
-    FILE* f = fopen(tof->filename, "rb");
-
-    fseek(f,nbrblocks * sizeof(block), SEEK_SET);
+    fseek(f, nbrblocks * sizeof(block), SEEK_SET);
     int found = fread(blockc, sizeof(block), 1, f);
     fclose(f);
 
-    if(found == 1){
+    if (found == 1)
         return 0;
-    }else{
+    else
         return -1;
-    }
 }
 
-void printcustomer(customer cust){
+void printcustomer(customer cust)
+{
     char str[200];
-    sprintf(str, "Customer Information:\nCustomer ID: %d\nFirst Name: %s\nLast Name: %s\nContact Info: %s\n",cust.customerID,cust.fname,cust.lname,cust.coninfo);
-    printf("\n\n%s",str);
+    sprintf(str, "Customer Information:\nCustomer ID: %d\nFirst Name: %s\nLast Name: %s\nContact Info: %s\n", cust.customerID, cust.fname, cust.lname, cust.coninfo);
+    printf("\n\n%s", str);
 }
