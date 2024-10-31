@@ -4,6 +4,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define MAX_RECORDS 10
+
 /*TOF* openfile(char* path,char mode, TOF* tof){ //this is my version of the code with a TOF pointer as a parameter
     switch(mode){
         case 'N':
@@ -63,7 +65,7 @@ void readmetadata(TOF* tof){
 void insertcustomer(TOF* tof,customer cust){
     block blockc;
     int read = readblock(tof,&blockc,tof->mdata.nbrblocks);
-    if(read == -1 || blockc.numRecords == 10 ){  /*i chose 10 as the max number of records*/
+    if(read == -1 || blockc.numRecords == MAX_RECORDS ){  /*10 as the max number of records*/
         block newblockc;
         newblockc.records[0].customer= cust;
         newblockc.numRecords = 1;

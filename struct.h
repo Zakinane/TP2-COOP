@@ -1,37 +1,69 @@
 #ifndef STRUCT_H
 #define STRUCT_H
 
-#define BLOCK_SIZE 10
-#define MAX_GAMES 10
+typedef struct customer{
+    int customerID ;
+    char fname[50];
+    char lname[50];
+    char coninfo[50];
+} customer;
 
-typedef struct Customer
-{
-    int customerID;
-    char firstName[50];
-    char lastName[50];
-    char contactInfo[100];
-} Customer;
+typedef struct customerblock{
+    customer customertab[10];
+    int nbrcustomers;
+}customerblock;
 
-typedef struct Date
-{
-    int day;
-    int month;
-    int year;
-} Date;
+typedef struct Game{
+    int gameID;
+    char gamename[100];
+    float price ;
+} game;
 
-typedef struct Game
-{
-    char title[100];
-    float rentalPrice;
-} Game;
+typedef struct Date{
+    int day ;
+    int month ;
+    int year ;
+} date;
 
-typedef struct Rental
-{
+typedef struct rentalram{  // this will call from the disk to get the IDs and save the correct information corresponding to the ID selected
     int rentalID;
-    Customer c;
-    Game games[MAX_GAMES];
-    Date rentalDate;
-    Date returnDate;
-} Rental;
+    customer customer;
+    game game;
+    date rentdate;
+    date returndate;
+    float price;
+}rentalram;
+
+typedef struct rentaldisk{  //the information that i will save in the hard drive that consists of only IDs of customers and games and the rent and return dates
+    int rentalID;
+    int customerID;
+    int gameID;
+    date rentdate;
+    date returndate;
+    float price;
+}rentaldisk;
+
+typedef struct Block{
+    int blockID;
+    int numRecords;
+    rentalram records[10];
+    struct Block* next;
+}block;
+
+typedef struct metadata{  //information that is saved at the top of the file everytime it is changed
+    int nbrblocks;
+    int lastid;
+    char path[200];
+}mdata;
+
+typedef struct Rentlistptr{
+    block* head;
+    block* tail;
+} rentlistptr;
+
+typedef struct TOF{ // we use this for openfile instead of a normal file so that we can add metadata to the top of the stored file
+    char filename[200]; // we must use "r+" mode for this file so that the metadata wil be placed at the top of the file and then the rest of the info after it
+    mdata mdata;
+}TOF;
 
 #endif
